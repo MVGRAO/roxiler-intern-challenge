@@ -1,0 +1,88 @@
+{
+    "info": {
+      "name": "InternChallenge Backend with Auth",
+      "_postman_id": "intern-challenge-collection",
+      "description": "Collection to test Auth & Protected APIs",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Signup User",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "url": { "raw": "http://localhost:3001/auth/signup", "protocol": "http", "host": ["localhost"], "port": "3001", "path": ["auth", "signup"] },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"alice123\",\n  \"role\": \"USER\",\n  \"address\": \"123 Main St\"\n}"
+          }
+        }
+      },
+      {
+        "name": "Signup Owner",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "url": { "raw": "http://localhost:3001/auth/signup", "protocol": "http", "host": ["localhost"], "port": "3001", "path": ["auth", "signup"] },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Bob\",\n  \"email\": \"bob@example.com\",\n  \"password\": \"bob123\",\n  \"role\": \"OWNER\",\n  \"address\": \"45 Market St\"\n}"
+          }
+        }
+      },
+      {
+        "name": "Login",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "let res = pm.response.json();",
+                "if (res.token) {",
+                "   pm.environment.set('jwt', res.token);",
+                "   console.log('JWT saved to environment');",
+                "}"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "url": { "raw": "http://localhost:3001/auth/login", "protocol": "http", "host": ["localhost"], "port": "3001", "path": ["auth", "login"] },
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"alice123\"\n}"
+          }
+        }
+      },
+      {
+        "name": "Get Users (Protected)",
+        "request": {
+          "method": "GET",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+          ],
+          "url": { "raw": "http://localhost:3001/users", "protocol": "http", "host": ["localhost"], "port": "3001", "path": ["users"] }
+        }
+      },
+      {
+        "name": "Get Stores (Protected)",
+        "request": {
+          "method": "GET",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{jwt}}", "type": "text" }
+          ],
+          "url": { "raw": "http://localhost:3001/stores", "protocol": "http", "host": ["localhost"], "port": "3001", "path": ["stores"] }
+        }
+      }
+    ]
+  }
+  

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:3001';
 
 // Helper function to get auth token
 const getAuthToken = () => {
@@ -32,7 +32,7 @@ const apiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Something went wrong');
+      throw new Error(data.message || data.error || 'Something went wrong');
     }
 
     return data;
@@ -45,48 +45,51 @@ const apiRequest = async (endpoint, options = {}) => {
 // Authentication API
 export const authAPI = {
   register: async (userData) => {
-    const response = await apiRequest('/users/register', {
+    const response = await apiRequest('/auth/signup', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
-    setAuthToken(response.token);
     return response;
   },
 
   login: async (credentials) => {
-    const response = await apiRequest('/users/login', {
+    const response = await apiRequest('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
     setAuthToken(response.token);
+    setCurrentUser(response.user);
     return response;
   },
 
   logout: () => {
     setAuthToken(null);
+    setCurrentUser(null);
   },
 
-  getProfile: async () => {
-    return await apiRequest('/users/profile');
-  },
-
-  updateProfile: async (profileData) => {
-    return await apiRequest('/users/profile', {
+  resetUserPassword: async (userId, newPassword) => {
+    return await apiRequest(`/admin/users/${userId}/reset-password`, {
       method: 'PUT',
-      body: JSON.stringify(profileData),
+      body: JSON.stringify({ newPassword }),
     });
+  },
+
+  updatePassword: async (passwordData) => {
+    return await apiRequest('/auth/update-password', {
+      method: 'PUT',
+      body: JSON.stringify(passwordData),
+    });
+  },
+
+  getCurrentUser: async () => {
+    return await apiRequest('/auth/me');
   },
 };
 
 // Stores API
 export const storesAPI = {
-  getAll: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
-    return await apiRequest(`/stores?${queryString}`);
-  },
-
-  getById: async (id) => {
-    return await apiRequest(`/stores/${id}`);
+  getAll: async () => {
+    return await apiRequest(`/stores`);
   },
 
   create: async (storeData) => {
@@ -96,31 +99,73 @@ export const storesAPI = {
     });
   },
 
-  update: async (id, storeData) => {
-    return await apiRequest(`/stores/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(storeData),
+  getMyStores: async () => {
+    return await apiRequest('/stores/mine');
+  },
+
+  getMyStoreDetails: async (storeId) => {
+    return await apiRequest(`/stores/mine/${storeId}`);
+  },
+
+  getMyStoreRatings: async (storeId) => {
+    return await apiRequest(`/stores/mine/${storeId}/ratings`);
+  },
+};
+
+// Admin API
+export const adminAPI = {
+  getStats: async () => {
+    return await apiRequest('/admin/stats');
+  },
+
+  getUsers: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await apiRequest(`/admin/users${query ? `?${query}` : ''}`);
+  },
+
+  createUser: async (userData) => {
+    return await apiRequest('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
     });
   },
 
-  delete: async (id) => {
-    return await apiRequest(`/stores/${id}`, {
+  updateUser: async (userId, userData) => {
+    return await apiRequest(`/admin/users/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  },
+
+  deleteUser: async (userId) => {
+    return await apiRequest(`/admin/users/${userId}`, {
       method: 'DELETE',
     });
   },
 
-  getMyStores: async () => {
-    return await apiRequest('/stores/owner/my-stores');
+  getUserDetails: async (userId) => {
+    return await apiRequest(`/admin/users/${userId}`);
+  },
+
+  getStores: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return await apiRequest(`/admin/stores${query ? `?${query}` : ''}`);
+  },
+
+  createStore: async (storeData) => {
+    return await apiRequest('/admin/stores', {
+      method: 'POST',
+      body: JSON.stringify(storeData),
+    });
+  },
+
+  getStoreDetails: async (storeId) => {
+    return await apiRequest(`/admin/stores/${storeId}`);
   },
 };
 
 // Ratings API
 export const ratingsAPI = {
-  getStoreRatings: async (storeId, params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
-    return await apiRequest(`/ratings/store/${storeId}?${queryString}`);
-  },
-
   create: async (ratingData) => {
     return await apiRequest('/ratings', {
       method: 'POST',
@@ -128,22 +173,25 @@ export const ratingsAPI = {
     });
   },
 
-  update: async (id, ratingData) => {
-    return await apiRequest(`/ratings/${id}`, {
+  update: async (ratingId, ratingData) => {
+    return await apiRequest(`/ratings/${ratingId}`, {
       method: 'PUT',
       body: JSON.stringify(ratingData),
     });
   },
 
-  delete: async (id) => {
-    return await apiRequest(`/ratings/${id}`, {
+  delete: async (ratingId) => {
+    return await apiRequest(`/ratings/${ratingId}`, {
       method: 'DELETE',
     });
   },
 
-  getMyRatings: async (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
-    return await apiRequest(`/ratings/user/my-ratings?${queryString}`);
+  getMyRatings: async () => {
+    return await apiRequest('/ratings/my-ratings');
+  },
+
+  getUserStoreRating: async (storeId, userId) => {
+    return await apiRequest(`/ratings/store/${storeId}/user/${userId}`);
   },
 };
 

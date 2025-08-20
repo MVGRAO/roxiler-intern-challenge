@@ -1,12 +1,29 @@
-import { useState } from 'react';
-import { mockStores } from '../../utils/mockData';
-// import StoreCard from './StoreCard.jsx';
-import StoreCard from './Storecard';
+import { useEffect, useState } from 'react';
+import { storesAPI } from '../../services/api.js';
+import StoreCard from './StoreCard.jsx';
 
 const StoreList = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [stores, setStores] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredStores = mockStores.filter(store =>
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await storesAPI.getAll();
+        setStores(data);
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+        alert('Failed to fetch stores. Please try again later.');
+        setLoading(false);
+      }
+    })();
+  }, []);
+  
+  console.log("Stores fetched:", stores);
+  console.log("Loading state:", loading);
+  
+  const filteredStores = stores.filter(store =>
     store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.address.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -21,11 +38,15 @@ const StoreList = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      {loading ? (
+        <div>Loading stores...</div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredStores.map(store => (
           <StoreCard key={store.id} store={store} />
         ))}
       </div>
+      )}
     </div>
   );
 };

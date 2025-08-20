@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useAuth } from '../../contexts/AuthContext.jsx';
 import {
   validateName,
   validatePassword,
@@ -9,30 +11,28 @@ import {
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    // Save user to localStorage (mock signup)
-    const newUser = {
+  const onSubmit = async (data) => {
+    const payload = {
       name: data.name,
       email: data.email,
       address: data.address,
       password: data.password,
-      role: data.role,
+      role: data.role === 'Store Owner' ? 'OWNER' : 'USER',
     };
-
-    localStorage.setItem("user", JSON.stringify(newUser));
-
-    alert("Signup successful!");
-
-    // Redirect based on role
-    if (newUser.role === "System Administrator") navigate("/admin");
-    else if (newUser.role === "Store Owner") navigate("/owner");
-    else navigate("/user"); // Normal User
+    try {
+      await registerUser(payload);
+      alert('Signup successful! Please login.');
+      navigate('/login');
+    } catch (err) {
+      alert('Signup failed');
+    }
   };
 
   return (

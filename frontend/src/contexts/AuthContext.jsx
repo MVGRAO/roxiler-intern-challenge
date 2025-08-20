@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, getCurrentUser, setCurrentUser, isAuthenticated } from '../services/api.js';
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -16,52 +18,31 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        if (isAuthenticated()) {
-          const currentUser = getCurrentUser();
-          if (currentUser) {
-            setUser(currentUser);
-          } else {
-            // Try to get fresh user data from API
-            const response = await authAPI.getProfile();
-            setUser(response.user);
-            setCurrentUser(response.user);
-          }
+    // Initialize from localStorage if token and user exist
+    try {
+      if (isAuthenticated()) {
+    const stored = getCurrentUser();
+    console.log("Stored user:", stored);
+        if (stored) {
+          setUser(stored);
         }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-        // Clear invalid auth data
-        authAPI.logout();
-        setCurrentUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    initializeAuth();
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const login = async (credentials) => {
-    try {
-      const response = await authAPI.login(credentials);
-      setUser(response.user);
-      setCurrentUser(response.user);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await authAPI.login(credentials);
+    setUser(response.user);
+    console.log("User role after login:", response.user.role);
+    setCurrentUser(response.user);
+    return response;
   };
 
   const register = async (userData) => {
-    try {
-      const response = await authAPI.register(userData);
-      setUser(response.user);
-      setCurrentUser(response.user);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await authAPI.register(userData);
+    return response;
   };
 
   const logout = () => {
@@ -70,15 +51,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const updateProfile = async (profileData) => {
-    try {
-      const response = await authAPI.updateProfile(profileData);
-      setUser(response.user);
-      setCurrentUser(response.user);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  const updateProfile = async (_profileData) => {
+    throw new Error('Not implemented');
   };
 
   const value = {

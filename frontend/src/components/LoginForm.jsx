@@ -1,118 +1,81 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '../contexts/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
-export default function LoginForm({ onSwitchToRegister }) {
+const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
   const { login } = useAuth();
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
 
-  const onSubmit = async (data) => {
-    setIsLoading(true);
-    setError('');
-    
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true); // Start loading
+
+    // Simulate a network delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     try {
-      await login(data);
-      // Login successful - redirect will be handled by router
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      const role = login(email, password); // Mock login
+
+      // Based on their roles, users will have access to different functionalities
+      if (role === 'System Administrator') navigate('/admin');
+      else if (role === 'Normal User') navigate('/user');
+      else if (role === 'Store Owner') navigate('/owner');
+      else alert('User not found!');
     } catch (error) {
-      setError(error.message || 'Login failed');
+        console.error("Login failed:", error);
+        alert('An error occurred. Please try again.');
     } finally {
-      setIsLoading(false);
+        setIsLoading(false); // Stop loading
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        <form onSubmit={handleLogin}>
+          <fieldset disabled={isLoading}> {/* Disable form elements when loading */}
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-gray-700">Email</label>
               <input
-                id="email"
                 type="email"
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address',
-                  },
-                })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your email"
+                name="email"
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-200"
+                defaultValue="user@example.com"
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-              )}
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-gray-700">Password</label>
               <input
-                id="password"
                 type="password"
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 6,
-                    message: 'Password must be at least 6 characters',
-                  },
-                })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your password"
+                name="password"
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-200"
+                defaultValue="password"
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-              )}
             </div>
-          </div>
-
-          <div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 flex items-center justify-center disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading && (
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={onSwitchToRegister}
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Sign up
-              </button>
-            </p>
-          </div>
+          </fieldset>
         </form>
+        <p className="text-sm text-center mt-4">
+          Login as: <strong>admin@example.com</strong>, <strong>user@example.com</strong>, or <strong>owner@example.com</strong>
+        </p>
       </div>
     </div>
   );
-}
+};
+
+export default Login;

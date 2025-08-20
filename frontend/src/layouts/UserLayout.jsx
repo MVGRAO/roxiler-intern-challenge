@@ -1,12 +1,13 @@
+import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
-const UserLayout = ({ children }) => {
+const UserLayout = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
       <main>
         <div className="container mx-auto px-6 py-8">
-          {children}
+          <Outlet/>
         </div>
       </main>
     </div>

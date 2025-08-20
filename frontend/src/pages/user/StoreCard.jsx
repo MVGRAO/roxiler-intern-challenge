@@ -1,4 +1,6 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react';
+import { ratingsAPI } from '../../services/api.js';
 
 const StarRating = ({ rating, setRating }) => {
   return (
@@ -22,8 +24,18 @@ const StarRating = ({ rating, setRating }) => {
 };
 
 const StoreCard = ({ store }) => {
-  // Mock state for user's rating
-  const [userRating, setUserRating] = useState(null); 
+  const [userRating, setUserRating] = useState(store.rating || null);
+
+  const submitRating = async (value) => {
+    const prev = userRating;
+    setUserRating(value);
+    try {
+      await ratingsAPI.create({ storeId: store.id, score: value });
+    } catch (e) {
+      setUserRating(prev);
+      alert('Failed to submit rating');
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
@@ -37,7 +49,7 @@ const StoreCard = ({ store }) => {
         <h4 className="font-semibold mb-2">Your Rating</h4>
         {userRating && <p className="text-gray-700 mb-2">You rated this store: {userRating} ★</p>}
         {/* Allows users to submit or modify their rating */}
-        <StarRating rating={userRating} setRating={setUserRating} />
+        <StarRating rating={userRating} setRating={submitRating} />
       </div>
     </div>
   );

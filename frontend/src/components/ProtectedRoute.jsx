@@ -13,8 +13,6 @@ const ProtectedRoute = ({ children, role }) => {
 
   console.log("User role:", user.role);
   if (role && user.role !== role) {
-    // Redirect to a default page if role doesn't match
-    // For simplicity, we redirect to login, but you can have a dedicated "Unauthorized" page.
     return <Navigate to="/login" />;
   }
 

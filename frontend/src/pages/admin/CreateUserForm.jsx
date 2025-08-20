@@ -23,7 +23,7 @@ const CreateUserForm = ({ onUserCreated }) => {
       setPassword('');
       setRole('USER');
       setAddress('');
-      onUserCreated(); // Callback to refresh user list
+      onUserCreated();
     } catch (err) {
       setError(err.message || 'Failed to create user. Please try again.');
     }

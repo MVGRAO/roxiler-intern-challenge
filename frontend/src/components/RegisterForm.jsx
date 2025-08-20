@@ -22,7 +22,7 @@ export default function RegisterForm({ onSwitchToLogin }) {
     
     try {
       await registerUser(data);
-      // Registration successful - redirect will be handled by router
+
     } catch (error) {
       setError(error.message || 'Registration failed');
     } finally {

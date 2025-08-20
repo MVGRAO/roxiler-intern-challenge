@@ -12,6 +12,7 @@ const StoreList = () => {
       try {
         const data = await storesAPI.getAll();
         setStores(data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching stores:", error);
         alert('Failed to fetch stores. Please try again later.');

@@ -11,15 +11,13 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true); // Start loading
 
-    // Simulate a network delay
+   
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
       const email = e.target.email.value;
       const password = e.target.password.value;
       const role = login(email, password); // Mock login
-
-      // Based on their roles, users will have access to different functionalities
       if (role === 'System Administrator') navigate('/admin');
       else if (role === 'Normal User') navigate('/user');
       else if (role === 'Store Owner') navigate('/owner');

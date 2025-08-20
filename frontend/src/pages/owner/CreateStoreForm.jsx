@@ -1,68 +1,77 @@
 import { useState } from 'react';
-import { storesAPI } from '../../services/api.js';
+import { storesAPI } from '../../services/api';
 
 const CreateStoreForm = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    address: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setLoading(true);
+    setError(null);
 
     try {
-      await storesAPI.create({ name, email, address });
-      setSuccess('Store created successfully!');
-      setName('');
-      setEmail('');
-      setAddress('');
+      await storesAPI.create(formData);
+      setSuccess(true);
+      window.location.href = '/owner';
     } catch (err) {
-      setError(err.message || 'Failed to create store. Please try again.');
+      setError(err.message || 'Failed to create store');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded">
-      <h2 className="text-lg font-bold">Register Store</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      {success && <p className="text-green-500">{success}</p>}
-      <div>
-        <label>Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="border rounded p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>Email:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="border rounded p-2 w-full"
-        />
-      </div>
-      <div>
-        <label>Address:</label>
-        <input
-          type="text"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          required
-          className="border rounded p-2 w-full"
-        />
-      </div>
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-        Register Store
-      </button>
-    </form>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6">Create Your Store</h1>
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Store Name</label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            className="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Email</label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            className="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Address</label>
+          <input
+            type="text"
+            value={formData.address}
+            onChange={(e) => setFormData({...formData, address: e.target.value})}
+            className="w-full px-3 py-2 border rounded"
+            required
+          />
+        </div>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {success && <div className="text-green-500 mb-4">Store created successfully!</div>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? 'Creating...' : 'Create Store'}
+        </button>
+      </form>
+    </div>
   );
 };
 

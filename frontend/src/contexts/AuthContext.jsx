@@ -1,10 +1,7 @@
-/* eslint-disable no-unused-vars */
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, getCurrentUser, setCurrentUser, isAuthenticated } from '../services/api.js';
 
 const AuthContext = createContext();
-
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

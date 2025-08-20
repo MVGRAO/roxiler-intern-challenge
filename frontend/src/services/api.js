@@ -1,11 +1,7 @@
 const API_BASE_URL = 'http://localhost:3001';
-
-// Helper function to get auth token
 const getAuthToken = () => {
   return localStorage.getItem('token');
 };
-
-// Helper function to set auth token
 const setAuthToken = (token) => {
   if (token) {
     localStorage.setItem('token', token);
@@ -13,8 +9,6 @@ const setAuthToken = (token) => {
     localStorage.removeItem('token');
   }
 };
-
-// Helper function to make API requests
 const apiRequest = async (endpoint, options = {}) => {
   const token = getAuthToken();
   
@@ -41,8 +35,6 @@ const apiRequest = async (endpoint, options = {}) => {
     throw error;
   }
 };
-
-// Authentication API
 export const authAPI = {
   register: async (userData) => {
     const response = await apiRequest('/auth/signup', {
@@ -85,8 +77,6 @@ export const authAPI = {
     return await apiRequest('/auth/me');
   },
 };
-
-// Stores API
 export const storesAPI = {
   getAll: async () => {
     return await apiRequest(`/stores`);
@@ -164,7 +154,6 @@ export const adminAPI = {
   },
 };
 
-// Ratings API
 export const ratingsAPI = {
   create: async (ratingData) => {
     return await apiRequest('/ratings', {
@@ -195,7 +184,6 @@ export const ratingsAPI = {
   },
 };
 
-// Utility functions
 export const isAuthenticated = () => {
   return !!getAuthToken();
 };

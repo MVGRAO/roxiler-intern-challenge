@@ -49,20 +49,17 @@ function App() {
         <Route path="stores" element={<StoresTable />} />
         <Route path="settings" element={<div>Settings Page</div>} />
       </Route>
-      
-      {/* Normal User Routes */}
-      <Route
+            <Route
         path="/user"
         element={
           <ProtectedRoute role="USER">
-            <UserLayout>
-              <UserDashboard />
-            </UserLayout>
+            <UserLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<UserDashboard />} />
+      </Route>
 
-      {/* Store Owner Routes */}
       <Route
         path="/owner"
         element={

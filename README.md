@@ -115,7 +115,3 @@ This is a full-stack web application built for the Roxiler Intern Coding Challen
 │   └── src
 └── README.md
 ```
-
-## License
-
-This project is licensed under the MIT License.

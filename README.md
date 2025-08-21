@@ -62,7 +62,7 @@ This is a full-stack web application built for the Roxiler Intern Coding Challen
 1.  **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/roxiler-intern-challenge.git
+    git clone https://github.com/MVGRAO/roxiler-intern-challenge.git
     ```
 
 2.  **Backend Setup:**
